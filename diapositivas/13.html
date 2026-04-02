@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Función Objetivo Dinámica</title>
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 40px; max-width: 1200px; width: 95%; border-top: 6px solid #34495e; }
+        .question-header { font-size: 1.2rem; font-weight: 600; color: #7f8c8d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .enunciado-container { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 30px; font-size: 1.15rem; line-height: 1.8; color: #444; }
+        
+        /* Estilos de subrayado dinámico */
+        .hl-prod { transition: background-color 0.3s; padding: 2px 4px; border-radius: 4px; }
+        .hl-nominal { transition: background-color 0.3s; padding: 2px 4px; border-radius: 4px; }
+        .hl-hiper { transition: background-color 0.3s; padding: 2px 4px; border-radius: 4px; }
+        .hl-inv { transition: background-color 0.3s; padding: 2px 4px; border-radius: 4px; }
+        .hl-bodega { transition: background-color 0.3s; padding: 2px 4px; border-radius: 4px; }
+
+        .active-prod { background-color: #d5f5e3; border-bottom: 2px solid #27ae60; }
+        .active-nominal { background-color: #d6eaf8; border-bottom: 2px solid #2980b9; }
+        .active-hiper { background-color: #ebf5fb; border-bottom: 2px solid #3498db; }
+        .active-inv { background-color: #fef9e7; border-bottom: 2px solid #f1c40f; }
+        .active-bodega { background-color: #fdedec; border-bottom: 2px solid #e74c3c; }
+        
+        .interactive-container { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #fafafa;}
+        .interactive-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 25px; color: #34495e; text-align: center;}
+        
+        .cost-list { list-style: none; padding: 0; font-size: 1.2rem; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;}
+        .cost-list li { background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 8px; display: flex; align-items: center; gap: 12px; transition: transform 0.2s; }
+        .cost-list li:hover { transform: scale(1.02); }
+        input[type="checkbox"] { transform: scale(1.5); cursor: pointer; }
+        
+        .equation-live { background: #2c3e50; color: #fff; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.4rem; margin-top: 25px; min-height: 40px;}
+        
+        .btn-reveal { background-color: #3498db; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; display: block; width: 100%; }
+        .btn-reveal:hover { background-color: #2980b9; }
+        
+        .solution-container { margin-top: 30px; padding: 30px; background-color: #ebedef; border-left: 6px solid #34495e; border-radius: 0 8px 8px 0; display: none; animation: slideDown 0.4s ease; }
+        .solution-title { font-weight: 700; color: #2c3e50; margin-bottom: 15px; font-size: 1.3rem; }
+        .math-display { background-color: #fdfefe; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; font-size: 1.4em; border: 1px solid #d5dbdb;}
+
+        .formula-legend { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; margin-top: 20px; font-size: 1.1rem; align-items: center; background-color: #fff; padding: 25px; border-radius: 8px; border: 1px solid #d5dbdb; }
+        .legend-symbol { font-weight: bold; color: #34495e; text-align: right; font-size: 1.3rem; padding-right: 10px; border-right: 2px solid #ecf0f1; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">Problema 2 - Función Objetivo</div>
+        
+        <div class="enunciado-container" id="enunciado">
+            Una empresa manufacturera debe planificar la producción... En el modo nominal, la producción implica un <span id="txt-nominal" class="hl-nominal">costo fijo $c_{i,t}^{\text{f,N}}$</span>. En cambio, en el modo hiper, la línea se configura para producir a una mayor tasa... aunque con un <span id="txt-hiper" class="hl-hiper">costo fijo más elevado: $c_{i,t}^{\text{f,H}}$</span>. El <span id="txt-prod" class="hl-prod">costo variable $c_{i,t}^{\text{v}}$</span> es independiente del modo de operación.
+            <br><br>
+            La empresa pronostica una demanda... es necesario manejar inventarios... asociada a <span id="txt-inv" class="hl-inv">costos de almacenamiento $h_{i,t}$</span>. En caso de requerir espacio adicional, la empresa puede habilitar, a un <span id="txt-bodega" class="hl-bodega">costo fijo $c_t^{\text{f,B}}$</span>, una zona de la bodega extra.
+            <br><br>
+            Desarrolle un modelo de Programación Lineal Entera (ILP) que permita a la empresa determinar el plan de producción que <strong>minimice el costo total asociado</strong>.
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Selecciona los costos identificados en el texto:</div>
+            <ul class="cost-list">
+                <li><input type="checkbox" id="check-prod" onchange="updateView()"> Costo Variable Prod. ($c^{\text{v}} \cdot x$)</li>
+                <li><input type="checkbox" id="check-inv" onchange="updateView()"> Costo Guardar Inv. ($h \cdot I$)</li>
+                <li><input type="checkbox" id="check-nominal" onchange="updateView()"> Costo Setup Nominal ($c^{\text{f,N}} \cdot y^{\text{N}}$)</li>
+                <li><input type="checkbox" id="check-hiper" onchange="updateView()"> Costo Setup Hiper ($c^{\text{f,H}} \cdot y^{\text{H}}$)</li>
+                <li style="grid-column: span 2; justify-content: center;"><input type="checkbox" id="check-bodega" onchange="updateView()"> Costo Ampliar Bodega ($c^{\text{f,B}} \cdot z$)</li>
+            </ul>
+            <div class="equation-live" id="liveEq">Z = (Selecciona elementos arriba)</div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Función Objetivo Completa</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución Matemática:</div>
+            <div class="math-display">
+                $$ \min Z = \sum_{t \in \mathcal{T}} \sum_{i \in \mathcal{I}} \left( c_{i,t}^{\text{v}} x_{i,t} + c_{i,t}^{\text{f,N}} y_{i,t}^{\text{N}} + c_{i,t}^{\text{f,H}} y_{i,t}^{\text{H}} + h_{i,t} I_{i,t} \right) + \sum_{t \in \mathcal{T}} c_t^{\text{f,B}} z_t $$
+            </div>
+
+            <div class="formula-legend">
+                <div class="legend-symbol">$c_{i,t}^{\text{v}} x_{i,t}$</div>
+                <div class="legend-desc">Costo variable total de fabricación.</div>
+                <div class="legend-symbol">$c_{i,t}^{\text{f}} y_{i,t}$</div>
+                <div class="legend-desc">Costos fijos de activación de la línea (Nominal o Hiper).</div>
+                <div class="legend-symbol">$h_{i,t} I_{i,t}$</div>
+                <div class="legend-desc">Costo por mantener stock en bodega.</div>
+                <div class="legend-symbol">$c_t^{\text{f,B}} z_t$</div>
+                <div class="legend-desc">Costo fijo por habilitar expansión volumétrica.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateView() {
+            const checks = {
+                prod: document.getElementById('check-prod'),
+                inv: document.getElementById('check-inv'),
+                nominal: document.getElementById('check-nominal'),
+                hiper: document.getElementById('check-hiper'),
+                bodega: document.getElementById('check-bodega')
+            };
+
+            const texts = {
+                prod: document.getElementById('txt-prod'),
+                inv: document.getElementById('txt-inv'),
+                nominal: document.getElementById('txt-nominal'),
+                hiper: document.getElementById('txt-hiper'),
+                bodega: document.getElementById('txt-bodega')
+            };
+
+            let formulaParts = [];
+
+            // Actualizar subrayados y construir frase de la fórmula
+            if (checks.prod.checked) { 
+                texts.prod.classList.add('active-prod'); 
+                formulaParts.push("C.Variable");
+            } else { texts.prod.classList.remove('active-prod'); }
+
+            if (checks.inv.checked) { 
+                texts.inv.classList.add('active-inv'); 
+                formulaParts.push("C.Inventario");
+            } else { texts.inv.classList.remove('active-inv'); }
+
+            if (checks.nominal.checked) { 
+                texts.nominal.classList.add('active-nominal'); 
+                formulaParts.push("C.Fijo_N");
+            } else { texts.nominal.classList.remove('active-nominal'); }
+
+            if (checks.hiper.checked) { 
+                texts.hiper.classList.add('active-hiper'); 
+                formulaParts.push("C.Fijo_H");
+            } else { texts.hiper.classList.remove('active-hiper'); }
+
+            if (checks.bodega.checked) { 
+                texts.bodega.classList.add('active-bodega'); 
+                formulaParts.push("C.Extra_Bodega");
+            } else { texts.bodega.classList.remove('active-bodega'); }
+
+            const liveEq = document.getElementById('liveEq');
+            if (formulaParts.length > 0) {
+                liveEq.innerText = "Z = " + formulaParts.join(" + ");
+            } else {
+                liveEq.innerText = "Z = (Selecciona elementos arriba)";
+            }
+        }
+
+        function toggleSolution() {
+            const box = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block'; btn.textContent = 'Ocultar Solución';
+            } else {
+                box.style.display = 'none'; btn.textContent = 'Ver Función Objetivo Completa';
+            }
+        }
+    </script>
+</body>
+</html>

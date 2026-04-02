@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Título del Control - Gestión de Operaciones</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f7f9; 
+            color: #333; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding: 20px; 
+            box-sizing: border-box; 
+        }
+
+        .card { 
+            background-color: #ffffff; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); 
+            padding: 50px 40px; 
+            max-width: 1200px; 
+            width: 95%; 
+            border-top: 8px solid #2c3e50; /* Color oscuro profesional */
+            text-align: center;
+        }
+
+        .control-number {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin: 0 0 40px 0;
+            font-weight: 800;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+            border-top: 2px solid #f4f7f9;
+            padding-top: 40px;
+            text-align: left;
+        }
+
+        .info-box {
+            background-color: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .info-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #3498db;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .info-content {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .semester-box {
+            border-left-color: #e67e22; /* Color naranja para variar */
+        }
+
+        .semester-box .info-label {
+            color: #e67e22;
+        }
+
+        .semester-val {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <span class="control-number">Evaluación Académica</span>
+        <h1 class="main-title">Control 1</h1>
+
+        <div class="info-grid">
+            <div class="info-box">
+                <span class="info-label">Asignatura</span>
+                <div class="info-content">
+                    ILN250 - Gestión de Investigación de Operaciones<br>
+                    <span style="font-size: 1.1rem; color: #7f8c8d;">Paralelos: CCC 001, 002 y 003 - CSV 100 y 101</span>
+                </div>
+            </div>
+
+            <div class="info-box semester-box">
+                <span class="info-label">Periodo Académico</span>
+                <div class="semester-val">Semestre 2025-2</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

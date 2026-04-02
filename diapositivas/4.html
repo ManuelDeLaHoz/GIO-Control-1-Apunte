@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta de Optimización - M-grande</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            max-width: 750px;
+            width: 100%;
+            border-top: 6px solid #2c3e50;
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-body {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .math-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        /* Estilos de la Simulación */
+        .simulation-container {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+
+        .simulation-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        input[type=range] {
+            width: 80%;
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        canvas {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .stats-box {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .nodes-count {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.2rem;
+        }
+
+        .btn-reveal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: block;
+            width: 100%;
+        }
+
+        .btn-reveal:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+        }
+
+        .solution-container {
+            margin-top: 25px;
+            padding: 25px;
+            background-color: #fff3f3;
+            border-left: 5px solid #e74c3c;
+            border-radius: 0 8px 8px 0;
+            display: none;
+            animation: slideDown 0.4s ease;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">
+            Problema (c)
+        </div>
+        
+        <div class="question-body">
+            La complejidad computacional de resolver un problema de programación entera mixta con restricciones del tipo \(M\)-grande es independiente de la elección del valor numérico de \(M\).
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-title">Simulador de Relajación Lineal vs Valor de \(M\)</div>
+            
+            <div class="slider-container">
+                <label for="mSlider" style="font-weight: bold;">Modifica el valor de \(M\): <span id="mValueDisplay" style="color: #2980b9;">10</span></label>
+                <input type="range" id="mSlider" min="10" max="100" value="10" step="1" oninput="updateSimulation()">
+                <div class="slider-labels">
+                    <span>\(M\) Ajustada</span>
+                    <span>\(M\) Excesivamente Grande</span>
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="searchCanvas" width="500" height="250"></canvas>
+            </div>
+
+            <div class="stats-box">
+                Nodos fraccionarios a explorar (aprox): <span class="nodes-count" id="nodesCountDisplay">15</span>
+            </div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Solución y Explicación</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución Detallada:</div>
+            <div style="font-size: 1.05rem; line-height: 1.6;">
+                <strong>FALSO.</strong> Mientras mayor sea \(M\), mayor será el número de soluciones factibles a explorar.
+                <br><br>
+                <strong>¿Por qué ocurre esto?</strong>
+                <ul>
+                    <li>Los solvers (como CPLEX o Gurobi) resuelven la <em>relajación lineal</em> del problema (ignorando temporalmente que las variables deben ser enteras).</li>
+                    <li>Un valor de \(M\) excesivamente grande crea una región factible continua gigantesca (el área coloreada en la simulación).</li>
+                    <li>Esto debilita la cota (bound) del problema, obligando al algoritmo de ramificación y acotamiento (Branch and Bound) a crear y evaluar muchísimos más nodos antes de poder descartar soluciones subóptimas, aumentando enormemente el tiempo de cómputo.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('searchCanvas');
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('mSlider');
+        const mDisplay = document.getElementById('mValueDisplay');
+        const nodesDisplay = document.getElementById('nodesCountDisplay');
+
+        // Configuraciones de dibujo
+        const originX = 40;
+        const originY = 210;
+        
+        // Crear una cuadrícula de "nodos" (posibles soluciones fraccionarias a explorar)
+        const nodes = [];
+        for (let x = 0; x <= 450; x += 15) {
+            for (let y = 0; y <= 200; y += 15) {
+                nodes.push({ cx: originX + x, cy: originY - y, valX: x, valY: y });
+            }
+        }
+
+        function drawAxes() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            // Ejes
+            ctx.moveTo(originX, 10);
+            ctx.lineTo(originX, canvas.height - 10);
+            ctx.moveTo(10, originY);
+            ctx.lineTo(canvas.width - 10, originY);
+            ctx.stroke();
+
+            // Etiquetas
+            ctx.font = "12px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText("Espacio de Búsqueda", canvas.width - 120, originY - 10);
+        }
+
+        function updateSimulation() {
+            let mValue = parseInt(slider.value);
+            mDisplay.innerText = mValue;
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Calcular el área de la "relajación lineal" basada en M
+            // Simulamos que el área crece proporcionalmente a M
+            let maxRadiusX = mValue * 4; 
+            let maxRadiusY = mValue * 1.8;
+
+            // Dibujar región relajada (Triángulo que crece)
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(originX + maxRadiusX, originY);
+            ctx.lineTo(originX, originY - maxRadiusY);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(52, 152, 219, 0.2)'; // Celeste transparente
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(52, 152, 219, 0.8)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Región Entera Óptima (Pequeña y fija al origen, simulando la solución real)
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(originX + 40, originY);
+            ctx.lineTo(originX, originY - 40);
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(46, 204, 113, 0.6)'; // Verde
+            ctx.fill();
+
+            let nodesExplored = 0;
+
+            // Dibujar nodos
+            nodes.forEach(node => {
+                // Verificar si el nodo cae dentro del triángulo de relajación
+                // Usando la ecuación de la recta del triángulo
+                let isInside = false;
+                if (node.valX <= maxRadiusX && node.valY <= maxRadiusY) {
+                    let lineY = maxRadiusY - (maxRadiusY / maxRadiusX) * node.valX;
+                    if (node.valY <= lineY) {
+                        isInside = true;
+                    }
+                }
+
+                if (isInside) {
+                    ctx.beginPath();
+                    ctx.arc(node.cx, node.cy, 3, 0, Math.PI * 2);
+                    // Nodos en el área verde (soluciones buenas) vs Nodos extra (basura explorada por M grande)
+                    if (node.valX <= 40 && node.valY <= 40 - node.valX) {
+                        ctx.fillStyle = '#27ae60'; // Verde oscuro
+                    } else {
+                        ctx.fillStyle = '#e74c3c'; // Rojo (nodos inútiles explorados)
+                        nodesExplored++;
+                    }
+                    ctx.fill();
+                } else {
+                    // Nodos fuera de la región actual (grises y pequeños)
+                    ctx.beginPath();
+                    ctx.arc(node.cx, node.cy, 1, 0, Math.PI * 2);
+                    ctx.fillStyle = '#bdc3c7';
+                    ctx.fill();
+                }
+            });
+
+            drawAxes();
+
+            // Actualizar contador
+            // Añadimos una base matemática para que el número se vea realista (crecimiento cuadrático aprox)
+            let estimatedNodes = Math.floor(Math.pow(mValue, 1.5) / 10) + nodesExplored;
+            nodesDisplay.innerText = estimatedNodes;
+        }
+
+        // Lógica de la interfaz de la solución
+        function toggleSolution() {
+            const solutionBox = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            
+            if (solutionBox.style.display === 'none' || solutionBox.style.display === '') {
+                solutionBox.style.display = 'block';
+                btn.textContent = 'Ocultar Solución';
+                btn.style.backgroundColor = '#7f8c8d';
+                
+                // Animar el slider hacia un M grande automáticamente para ilustrar
+                let targetM = 90;
+                let currentM = parseInt(slider.value);
+                if (currentM < targetM) {
+                    let interval = setInterval(() => {
+                        currentM += 2;
+                        slider.value = currentM;
+                        updateSimulation();
+                        if (currentM >= targetM) clearInterval(interval);
+                    }, 20);
+                }
+            } else {
+                solutionBox.style.display = 'none';
+                btn.textContent = 'Ver Solución y Explicación';
+                btn.style.backgroundColor = '#3498db';
+            }
+        }
+
+        // Dibujo inicial
+        window.onload = updateSimulation;
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Restricción 1</title>
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 40px; max-width: 1200px; width: 95%; border-top: 6px solid #e74c3c; }
+        .question-header { font-size: 1.2rem; font-weight: 600; color: #7f8c8d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .enunciado-container { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 30px; font-size: 1.15rem; line-height: 1.6; color: #444; }
+        .highlight { background-color: #e74c3c; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .math-display { background-color: #fdfefe; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; font-size: 1.4em; border: 1px solid #fadbd8; }
+        
+        .interactive-container { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #fafafa; }
+        .interactive-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 25px; color: #34495e; text-align: center; }
+        .logic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: center; margin-bottom: 25px; }
+        .variable-box { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #ddd; transition: all 0.3s; }
+        .variable-box.active { border-color: #3498db; background-color: #ebf5fb; }
+        .var-name { font-weight: bold; font-size: 1.2rem; margin-bottom: 15px; }
+        
+        .switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #3498db; }
+        input:checked + .slider:before { transform: translateX(30px); }
+        
+        .equation-live { background: #2c3e50; color: #fff; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.5rem; transition: background-color 0.3s;}
+        .equation-live.error { background-color: #c0392b; }
+        .conclusion-text { margin-top: 20px; text-align: center; font-weight: bold; font-size: 1.1rem; color: #c0392b; min-height: 28px; }
+        
+        .btn-reveal { background-color: #3498db; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; display: block; width: 100%; }
+        .btn-reveal:hover { background-color: #2980b9; }
+        .solution-container { margin-top: 30px; padding: 30px; background-color: #fdedec; border-left: 6px solid #e74c3c; border-radius: 0 8px 8px 0; display: none; animation: slideDown 0.4s ease; }
+        .solution-title { font-weight: 700; color: #c0392b; margin-bottom: 15px; font-size: 1.3rem; }
+        
+        /* Estilos para la leyenda de la fórmula */
+        .formula-legend { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; margin-top: 20px; font-size: 1.1rem; align-items: center; background-color: #fff; padding: 25px; border-radius: 8px; border: 1px solid #fadbd8; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .legend-symbol { font-weight: bold; color: #e74c3c; text-align: right; font-size: 1.3rem; padding-right: 10px; border-right: 2px solid #ecf0f1; }
+        .legend-desc { color: #444; line-height: 1.5;}
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">Problema 2 - Restricción 1</div>
+        
+        <div class="enunciado-container">
+            Una empresa manufacturera debe planificar la producción de su cartera de \(|\mathcal{I}|\) productos durante los próximos \(|\mathcal{T}|\) periodos. La compañía dispone de una <span class="highlight">única línea de producción</span>, la cual puede operar en <span class="highlight">dos modos mutuamente excluyentes</span>: nominal e hiper. 
+            <br><br>
+            La empresa pronostica para cada producto una demanda \(d_{i,t}\) en cada periodo del horizonte de planificación. Para satisfacer estas demandas, dado que la línea de producción <span class="highlight">solo puede configurarse para fabricar un tipo de producto por periodo</span>, es necesario manejar inventarios.
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Simulador de Exclusividad (Para un producto $i$)</div>
+            <div class="logic-grid">
+                <div class="variable-box" id="boxN">
+                    <div class="var-name">Modo Nominal (\(y^{\text{N}}\))</div>
+                    <label class="switch"><input type="checkbox" id="yN" onchange="evalExclusividad()"><span class="slider"></span></label>
+                    <div style="margin-top:10px; font-weight:bold; font-size:1.2rem;" id="valN">0</div>
+                </div>
+                <div class="variable-box" id="boxH">
+                    <div class="var-name">Modo Hiper (\(y^{\text{H}}\))</div>
+                    <label class="switch"><input type="checkbox" id="yH" onchange="evalExclusividad()"><span class="slider"></span></label>
+                    <div style="margin-top:10px; font-weight:bold; font-size:1.2rem;" id="valH">0</div>
+                </div>
+            </div>
+            <div class="equation-live" id="liveEq">\( 0 + 0 \le 1 \) (VÁLIDO)</div>
+            <div class="conclusion-text" id="conclusionTxt">La línea está apagada.</div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Restricción Formal</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución:</div>
+            <p style="font-size: 1.15rem;">Se garantiza que, sumando todos los productos y modos, a lo sumo se encienda 1 opción por periodo:</p>
+            <div class="math-display">
+                $$\sum_{i \in \mathcal{I}} (y_{i,t}^{\text{N}} + y_{i,t}^{\text{H}}) \le 1 \quad \forall t \in \mathcal{T}$$
+            </div>
+            
+            <div class="formula-legend">
+                <div class="legend-symbol">\(\sum_{i \in \mathcal{I}}\)</div>
+                <div class="legend-desc">Sumatoria sobre todos los productos \(i\) en el conjunto de productos \(\mathcal{I}\). Asegura que la exclusividad aplique a todos los productos, no solo a uno.</div>
+                
+                <div class="legend-symbol">\(y_{i,t}^{\text{N}}\)</div>
+                <div class="legend-desc">Variable binaria. Toma el valor 1 si el producto \(i\) se fabrica en el periodo \(t\) usando el modo <strong>nominal</strong>, y 0 en caso contrario.</div>
+                
+                <div class="legend-symbol">\(y_{i,t}^{\text{H}}\)</div>
+                <div class="legend-desc">Variable binaria. Toma el valor 1 si el producto \(i\) se fabrica en el periodo \(t\) usando el modo <strong>hiper</strong>, y 0 en caso contrario.</div>
+                
+                <div class="legend-symbol">\(\le 1\)</div>
+                <div class="legend-desc">Establece el límite de exclusividad. Al ser menor o igual a 1, permite que la línea esté apagada (suma = 0) o que fabrique un solo producto en un solo modo (suma = 1), pero impide usar dos modos a la vez (suma > 1).</div>
+                
+                <div class="legend-symbol">\(\forall t \in \mathcal{T}\)</div>
+                <div class="legend-desc">"Para todo periodo \(t\) en el horizonte de tiempo \(\mathcal{T}\)". Indica que esta regla debe cumplirse en cada uno de los periodos evaluados de forma independiente.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function evalExclusividad() {
+            const yN = document.getElementById('yN').checked ? 1 : 0;
+            const yH = document.getElementById('yH').checked ? 1 : 0;
+            
+            document.getElementById('valN').innerText = yN;
+            document.getElementById('valH').innerText = yH;
+            
+            document.getElementById('boxN').className = 'variable-box' + (yN ? ' active' : '');
+            document.getElementById('boxH').className = 'variable-box' + (yH ? ' active' : '');
+
+            const suma = yN + yH;
+            const liveEq = document.getElementById('liveEq');
+            const conclusionTxt = document.getElementById('conclusionTxt');
+
+            if (suma > 1) {
+                liveEq.className = "equation-live error";
+                liveEq.innerHTML = `\\( ${yN} + ${yH} = 2 \\not\\le 1 \\) (INVÁLIDO)`;
+                conclusionTxt.innerHTML = "¡Choque! No puedes usar dos modos a la vez en la misma línea.";
+            } else {
+                liveEq.className = "equation-live";
+                liveEq.innerHTML = `\\( ${yN} + ${yH} = ${suma} \\le 1 \\) (VÁLIDO)`;
+                conclusionTxt.innerHTML = suma === 1 ? "Un modo operando correctamente." : "La línea está apagada.";
+                conclusionTxt.style.color = suma === 1 ? "#27ae60" : "#7f8c8d";
+            }
+            if (window.MathJax) MathJax.typesetPromise([liveEq]);
+        }
+
+        function toggleSolution() {
+            const box = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block'; btn.textContent = 'Ocultar Solución'; btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                box.style.display = 'none'; btn.textContent = 'Ver Restricción Formal'; btn.style.backgroundColor = '#3498db';
+            }
+        }
+    </script>
+</body>
+</html>

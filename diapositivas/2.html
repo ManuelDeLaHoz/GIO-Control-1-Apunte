@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta de Poliedros y Simulación</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            max-width: 750px;
+            width: 100%;
+            border-top: 6px solid #2c3e50;
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-body {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .math-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        .simulation-container {
+            margin-top: 30px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+
+        .simulation-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .canvas-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        canvas {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1rem;
+            user-select: none;
+        }
+
+        .control-label input {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .color-box {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border-radius: 3px;
+            border: 1px solid #aaa;
+        }
+
+        .btn-reveal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .btn-reveal:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+        }
+
+        .solution-container {
+            margin-top: 25px;
+            padding: 25px;
+            background-color: #fff3f3;
+            border-left: 5px solid #e74c3c;
+            border-radius: 0 8px 8px 0;
+            display: none;
+            animation: slideDown 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .solution-title {
+            font-weight: 700;
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .solution-content {
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .solution-content ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        .solution-content li {
+            margin-bottom: 8px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">
+            Problema (a)
+        </div>
+        
+        <div class="question-body">
+            El conjunto de soluciones factibles dado por el siguiente poliedro:
+            
+            <div class="math-display">
+                $$ \mathcal{P} = \{(x_1, x_2) \in \mathbb{R}^2 : x_1 + x_2 \le 1, 3x_1 + 4x_2 \ge 6, x_1 \ge 0, x_2 \ge 0\} $$
+            </div>
+            
+            es no vacío y acotado.
+        </div>
+
+        <div class="simulation-container">
+            <div class="simulation-title">Simulador Gráfico del Poliedro</div>
+            
+            <div class="canvas-container">
+                <canvas id="graphCanvas" width="400" height="300"></canvas>
+            </div>
+
+            <div class="controls">
+                <label class="control-label">
+                    <input type="checkbox" id="chkQuad" checked onchange="draw()">
+                    <span class="color-box" style="background-color: rgba(200, 200, 200, 0.4);"></span>
+                    \( x_1 \ge 0, x_2 \ge 0 \) (Primer cuadrante)
+                </label>
+                <label class="control-label">
+                    <input type="checkbox" id="chkEq1" checked onchange="draw()">
+                    <span class="color-box" style="background-color: rgba(52, 152, 219, 0.4);"></span>
+                    \( x_1 + x_2 \le 1 \)
+                </label>
+                <label class="control-label">
+                    <input type="checkbox" id="chkEq2" checked onchange="draw()">
+                    <span class="color-box" style="background-color: rgba(231, 76, 60, 0.4);"></span>
+                    \( 3x_1 + 4x_2 \ge 6 \)
+                </label>
+            </div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Solución y Explicación</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución Detallada:</div>
+            <div class="solution-content">
+                <strong>FALSO. El poliedro es vacío.</strong>
+                <p>Para que el poliedro no sea vacío, debe existir al menos un punto que cumpla <strong>todas</strong> las condiciones al mismo tiempo. Analicemos:</p>
+                <ul>
+                    <li>La primera restricción nos limita a: \( x_1 + x_2 \le 1 \). Dentro del primer cuadrante (\(x_1 \ge 0, x_2 \ge 0\)), los valores máximos posibles que pueden tomar \(x_1\) o \(x_2\) son \(1\). Los puntos extremos de esta área son \( (1,0) \) y \( (0,1) \).</li>
+                    <li>La segunda restricción exige: \( 3x_1 + 4x_2 \ge 6 \). Si probamos los puntos máximos de la primera restricción en esta segunda ecuación:
+                        <ul>
+                            <li>Evaluando en \( (1,0) \): \( 3(1) + 4(0) = 3 \). Y sabemos que \( 3 \not\ge 6 \).</li>
+                            <li>Evaluando en \( (0,1) \): \( 3(0) + 4(1) = 4 \). Y sabemos que \( 4 \not\ge 6 \).</li>
+                        </ul>
+                    </li>
+                    <li><strong>Conclusión:</strong> Ni siquiera los puntos más altos de la primera región logran alcanzar el mínimo requerido por la segunda región. Por lo tanto, no existe intersección posible.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let showVisualAlert = false;
+        let animationFrameId;
+        let blinkOpacity = 0;
+        let blinkDirection = 1;
+
+        function toggleSolution() {
+            const solutionBox = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            
+            if (solutionBox.style.display === 'none' || solutionBox.style.display === '') {
+                solutionBox.style.display = 'block';
+                btn.textContent = 'Ocultar Solución';
+                btn.style.backgroundColor = '#7f8c8d';
+                
+                // Forzar encendido de todas las capas
+                document.getElementById('chkQuad').checked = true;
+                document.getElementById('chkEq1').checked = true;
+                document.getElementById('chkEq2').checked = true;
+                
+                showVisualAlert = true;
+                animateAlert();
+            } else {
+                solutionBox.style.display = 'none';
+                btn.textContent = 'Ver Solución y Explicación';
+                btn.style.backgroundColor = '#3498db';
+                
+                showVisualAlert = false;
+                cancelAnimationFrame(animationFrameId);
+                draw(); // Redibujar sin la alerta
+            }
+        }
+
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+        const originX = 50;
+        const originY = 250;
+        const scale = 70; 
+
+        function mathToCanvas(x, y) {
+            return {
+                cx: originX + x * scale,
+                cy: originY - y * scale
+            };
+        }
+
+        function drawAxes() {
+            ctx.beginPath();
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            
+            ctx.moveTo(originX, 10);
+            ctx.lineTo(originX, canvas.height - 10);
+            
+            ctx.moveTo(10, originY);
+            ctx.lineTo(canvas.width - 10, originY);
+            ctx.stroke();
+
+            ctx.font = "13px Arial";
+            ctx.fillStyle = "#333";
+            ctx.fillText("x₁", canvas.width - 20, originY - 10);
+            ctx.fillText("x₂", originX + 10, 20);
+
+            for(let i = 1; i <= 4; i++) {
+                let pX = mathToCanvas(i, 0);
+                ctx.fillRect(pX.cx - 1, originY - 3, 2, 6);
+                ctx.fillText(i, pX.cx - 4, originY + 15);
+
+                let pY = mathToCanvas(0, i);
+                ctx.fillRect(originX - 3, pY.cy - 1, 6, 2);
+                ctx.fillText(i, originX - 15, pY.cy + 4);
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const chkQuad = document.getElementById('chkQuad').checked;
+            const chkEq1 = document.getElementById('chkEq1').checked;
+            const chkEq2 = document.getElementById('chkEq2').checked;
+
+            if (chkQuad) {
+                ctx.fillStyle = 'rgba(200, 200, 200, 0.3)';
+                let pOrigin = mathToCanvas(0, 0);
+                let pTopRight = mathToCanvas(10, 10);
+                ctx.fillRect(pOrigin.cx, pTopRight.cy, pTopRight.cx - pOrigin.cx, pOrigin.cy - pTopRight.cy);
+            }
+
+            if (chkEq1) {
+                ctx.fillStyle = 'rgba(52, 152, 219, 0.5)';
+                let p1 = mathToCanvas(-10, 11);
+                let p2 = mathToCanvas(10, -9);
+                let p3 = mathToCanvas(10, -10);
+                let p4 = mathToCanvas(-10, -10);
+                
+                ctx.beginPath();
+                ctx.moveTo(p1.cx, p1.cy);
+                ctx.lineTo(p2.cx, p2.cy);
+                ctx.lineTo(p3.cx, p3.cy); 
+                ctx.lineTo(p4.cx, p4.cy);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = '#2980b9';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(p1.cx, p1.cy);
+                ctx.lineTo(p2.cx, p2.cy);
+                ctx.stroke();
+            }
+
+            if (chkEq2) {
+                ctx.fillStyle = 'rgba(231, 76, 60, 0.5)';
+                let p1 = mathToCanvas(-10, 9);
+                let p2 = mathToCanvas(10, -6);
+                let p3 = mathToCanvas(10, 10);
+                let p4 = mathToCanvas(-10, 10);
+                
+                ctx.beginPath();
+                ctx.moveTo(p1.cx, p1.cy);
+                ctx.lineTo(p2.cx, p2.cy);
+                ctx.lineTo(p3.cx, p3.cy); 
+                ctx.lineTo(p4.cx, p4.cy);
+                ctx.closePath();
+                ctx.fill();
+                
+                ctx.strokeStyle = '#c0392b';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(p1.cx, p1.cy);
+                ctx.lineTo(p2.cx, p2.cy);
+                ctx.stroke();
+            }
+
+            drawAxes();
+
+            // Dibujar la alerta visual si está activada
+            if (showVisualAlert) {
+                let pAlert = mathToCanvas(1.3, 1.1); 
+                
+                ctx.save();
+                ctx.fillStyle = `rgba(192, 57, 43, ${blinkOpacity})`;
+                ctx.font = "bold 16px Arial";
+                ctx.textAlign = "center";
+                
+                // Fondo blanco para el texto para que resalte
+                let text = "¡ESPACIO VACÍO!";
+                let textWidth = ctx.measureText(text).width;
+                ctx.fillStyle = `rgba(255, 255, 255, ${blinkOpacity * 0.9})`;
+                ctx.fillRect(pAlert.cx - textWidth/2 - 5, pAlert.cy - 15, textWidth + 10, 22);
+                
+                ctx.fillStyle = `rgba(192, 57, 43, ${blinkOpacity})`;
+                ctx.fillText(text, pAlert.cx, pAlert.cy + 2);
+                
+                // Dibujar flechitas señalando la separación
+                ctx.beginPath();
+                ctx.moveTo(pAlert.cx - 20, pAlert.cy + 15);
+                ctx.lineTo(pAlert.cx - 40, pAlert.cy + 30);
+                ctx.moveTo(pAlert.cx + 20, pAlert.cy - 20);
+                ctx.lineTo(pAlert.cx + 40, pAlert.cy - 35);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = `rgba(192, 57, 43, ${blinkOpacity})`;
+                ctx.stroke();
+
+                ctx.restore();
+            }
+        }
+
+        // Loop de animación para el parpadeo de la alerta
+        function animateAlert() {
+            if (!showVisualAlert) return;
+
+            blinkOpacity += 0.03 * blinkDirection;
+            if (blinkOpacity >= 1) {
+                blinkOpacity = 1;
+                blinkDirection = -1;
+            } else if (blinkOpacity <= 0.2) {
+                blinkOpacity = 0.2;
+                blinkDirection = 1;
+            }
+
+            draw();
+            animationFrameId = requestAnimationFrame(animateAlert);
+        }
+
+        window.onload = draw;
+    </script>
+</body>
+</html>

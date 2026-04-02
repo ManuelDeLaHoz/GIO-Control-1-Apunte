@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta de Optimización - Restricción de Igualdad</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            max-width: 780px;
+            width: 100%;
+            border-top: 6px solid #2c3e50;
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-body {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .math-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+            overflow-x: auto;
+        }
+
+        /* Estilos del Validador Interactivo */
+        .interactive-container {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            background-color: #fafafa;
+        }
+
+        .interactive-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .logic-grid {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .variable-box {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.3s;
+            width: 150px;
+        }
+
+        .variable-box.active {
+            border-color: #3498db;
+            background-color: #ebf5fb;
+        }
+
+        .var-name {
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        /* Toggles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+        .switch input { 
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3498db;
+        }
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        .equation-live {
+            background: #2c3e50;
+            color: #fff;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 1.4rem;
+            min-height: 40px;
+            transition: background-color 0.3s;
+        }
+
+        .equation-live.success {
+            background-color: #27ae60;
+        }
+
+        .equation-live.error {
+            background-color: #c0392b;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-top: 15px;
+        }
+
+        .badge-success { background-color: #d5f5e3; color: #27ae60; }
+        .badge-error { background-color: #fadbd8; color: #c0392b; }
+
+        .conclusion-text {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 1.1rem;
+            min-height: 48px;
+        }
+
+        .btn-reveal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: block;
+            width: 100%;
+        }
+
+        .btn-reveal:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+        }
+
+        .solution-container {
+            margin-top: 25px;
+            padding: 25px;
+            background-color: #fff3f3;
+            border-left: 5px solid #e74c3c;
+            border-radius: 0 8px 8px 0;
+            display: none;
+            animation: slideDown 0.4s ease;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .highlight {
+            font-weight: bold;
+            background-color: #f1c40f;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">
+            Problema (e)
+        </div>
+        
+        <div class="question-body">
+            En un problema binario puro, la restricción \( x_i + x_j = 1 \) significa que <span class="highlight">se puede</span> seleccionar la alternativa \( i \) o la alternativa \( j \), pero no ambas simultáneamente.
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Validador de Exclusividad y Obligatoriedad</div>
+            
+            <div class="logic-grid">
+                <div class="variable-box" id="boxI">
+                    <div class="var-name">Alternativa \(i\)</div>
+                    <label class="switch">
+                        <input type="checkbox" id="xi" onchange="evaluateEquation()">
+                        <span class="slider"></span>
+                    </label>
+                    <div style="margin-top:10px; font-weight:bold; font-size:1.2rem;" id="valI">0</div>
+                </div>
+                
+                <div class="variable-box" id="boxJ">
+                    <div class="var-name">Alternativa \(j\)</div>
+                    <label class="switch">
+                        <input type="checkbox" id="xj" onchange="evaluateEquation()">
+                        <span class="slider"></span>
+                    </label>
+                    <div style="margin-top:10px; font-weight:bold; font-size:1.2rem;" id="valJ">0</div>
+                </div>
+            </div>
+
+            <div class="equation-live error" id="liveEq">
+                \( 0 + 0 = 0 \neq 1 \)
+            </div>
+            
+            <div style="text-align: center;">
+                <div class="status-badge badge-error" id="statusBadge">INVÁLIDO</div>
+            </div>
+
+            <div class="conclusion-text" id="conclusionTxt">
+                Al tener ambas en 0, no se cumple la ecuación. Esto demuestra que <strong>no es opcional</strong> ("se puede"), sino obligatorio elegir una.
+            </div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Solución y Explicación</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución Detallada:</div>
+            <div style="font-size: 1.05rem; line-height: 1.6;">
+                <strong>FALSO.</strong> La restricción significa que se <strong>debe</strong> seleccionar la alternativa \(i\) o la alternativa \(j\), pero no ambas simultáneamente.
+                <br><br>
+                <strong>Diferencia clave en modelamiento:</strong>
+                <ul>
+                    <li><strong>Se puede (Opcional):</strong> Se modelaría con \( x_i + x_j \le 1 \). Esto permite que la suma sea 0 (no elegir ninguna).</li>
+                    <li><strong>Se debe (Obligatorio):</strong> Se modela con \( x_i + x_j = 1 \). Al exigir que la suma sea exactamente 1, prohíbe que ambas sean 0 y prohíbe que ambas sean 1. Obliga a elegir exactamente una.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function evaluateEquation() {
+            const xi = document.getElementById('xi').checked ? 1 : 0;
+            const xj = document.getElementById('xj').checked ? 1 : 0;
+            
+            document.getElementById('valI').innerText = xi;
+            document.getElementById('valJ').innerText = xj;
+            
+            if(xi) document.getElementById('boxI').classList.add('active');
+            else document.getElementById('boxI').classList.remove('active');
+            
+            if(xj) document.getElementById('boxJ').classList.add('active');
+            else document.getElementById('boxJ').classList.remove('active');
+
+            const suma = xi + xj;
+            const liveEq = document.getElementById('liveEq');
+            const statusBadge = document.getElementById('statusBadge');
+            const conclusionTxt = document.getElementById('conclusionTxt');
+
+            // Resetear clases
+            liveEq.className = "equation-live";
+            statusBadge.className = "status-badge";
+
+            if (suma === 1) {
+                // Válido
+                liveEq.classList.add('success');
+                liveEq.innerHTML = `\\( ${xi} + ${xj} = 1 \\)`;
+                statusBadge.classList.add('badge-success');
+                statusBadge.innerText = "VÁLIDO";
+                conclusionTxt.innerHTML = "Perfecto. Se ha elegido exactamente una alternativa, cumpliendo la obligación.";
+            } else if (suma === 0) {
+                // Inválido (Falta elegir)
+                liveEq.classList.add('error');
+                liveEq.innerHTML = `\\( ${xi} + ${xj} = 0 \\neq 1 \\)`;
+                statusBadge.classList.add('badge-error');
+                statusBadge.innerText = "INVÁLIDO (Falta elegir)";
+                conclusionTxt.innerHTML = "Al tener ambas en 0, no se cumple la ecuación. Esto demuestra que <strong>no es opcional</strong> (\"se puede\"), sino obligatorio elegir una.";
+            } else if (suma === 2) {
+                // Inválido (Ambas elegidas)
+                liveEq.classList.add('error');
+                liveEq.innerHTML = `\\( ${xi} + ${xj} = 2 \\neq 1 \\)`;
+                statusBadge.classList.add('badge-error');
+                statusBadge.innerText = "INVÁLIDO (Ambas elegidas)";
+                conclusionTxt.innerHTML = "La suma da 2, violando la restricción de exclusividad. No se pueden elegir ambas simultáneamente.";
+            }
+
+            // Obligamos a MathJax a re-procesar las ecuaciones dinámicas
+            if (window.MathJax) {
+                MathJax.typesetPromise([liveEq]).catch(function (err) {
+                    console.log('Error de MathJax: ' + err.message);
+                });
+            }
+        }
+
+        // Ejecutar evaluación inicial
+        window.onload = function() {
+            setTimeout(evaluateEquation, 300);
+        };
+
+        function toggleSolution() {
+            const solutionBox = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            
+            if (solutionBox.style.display === 'none' || solutionBox.style.display === '') {
+                solutionBox.style.display = 'block';
+                btn.textContent = 'Ocultar Solución';
+                btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                solutionBox.style.display = 'none';
+                btn.textContent = 'Ver Solución y Explicación';
+                btn.style.backgroundColor = '#3498db';
+            }
+        }
+    </script>
+</body>
+</html>

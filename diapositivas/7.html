@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enunciado del Problema ILP - Final</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: #f4f7f9; 
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+        .card { 
+            background-color: #ffffff; 
+            border-radius: 12px; 
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1); 
+            padding: 40px; 
+            max-width: 1000px; 
+            width: 90%; 
+            border-top: 8px solid #2c3e50;
+            box-sizing: border-box;
+            /* Estas líneas aseguran que el contenido no se escape */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+        .header {
+            border-bottom: 2px solid #eee;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+        }
+        .enunciado-content { 
+            font-size: 1.2rem; 
+            line-height: 1.7; 
+            color: #2c3e50; 
+            text-align: justify;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        .footer-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .footer-box ul {
+            margin: 10px 0 0 20px;
+        }
+        /* Clase para forzar que las fórmulas no estiren el contenedor */
+        .math-var {
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>2. PROBLEMA</h1>
+        </div>
+
+        <div class="enunciado-content">
+            <p>
+                Una empresa manufacturera debe planificar la producción de su cartera de <span class="math-var">$|\mathcal{I}|$</span> productos durante los próximos <span class="math-var">$|\mathcal{T}|$</span> periodos. La compañía dispone de una única línea de producción, la cual puede operar en dos modos mutuamente excluyentes: <strong>nominal</strong> e <strong>hiper</strong>. 
+            </p>
+            
+            <p>
+                En el modo nominal, la producción del producto <span class="math-var">$i$</span> en el periodo <span class="math-var">$t$</span> implica un costo fijo <span class="math-var">$c_{i,t}^{\text{f,N}}$</span> ($), asociado a una capacidad de producción <span class="math-var">$p_{i,t}^{\text{N}}$</span> (u), dada por la tasa nominal de operación de la línea. 
+            </p>
+            
+            <p>
+                En cambio, en el modo hiper, la línea se configura para producir a una mayor tasa, lo que proporciona una mayor capacidad de producción <span class="math-var">$p_{i,t}^{\text{H}}$</span> (u), aunque con un costo fijo más elevado: <span class="math-var">$c_{i,t}^{\text{f,H}}$</span> ($). El costo variable <span class="math-var">$c_{i,t}^{\text{v}}$</span> (u/$) es independiente del modo de operación.
+            </p>
+
+            <p>
+                La empresa pronostica para cada producto una demanda <span class="math-var">$d_{i,t}$</span> (u) en cada periodo del horizonte de planificación. Para satisfacer estas demandas, dado que la línea de producción solo puede configurarse para fabricar un tipo de producto por periodo, es necesario manejar inventarios. 
+            </p>
+
+            <p>
+                Para ello, la empresa cuenta con una bodega de capacidad <span class="math-var">$V$</span> (m³), asociada a costos de almacenamiento <span class="math-var">$h_{i,t}$</span> ($/u). En caso de requerir espacio adicional, la empresa puede habilitar, a un costo fijo <span class="math-var">$c_t^{\text{f,B}}$</span> ($), una zona de la bodega que provee <span class="math-var">$\Delta V$</span> (m³) extra de capacidad. 
+            </p>
+            
+            <p>
+                Asimismo, se conocen los volúmenes unitarios ocupados por cada tipo de producto, <span class="math-var">$v_i$</span> (m³) y los niveles de inventario iniciales <span class="math-var">$I_{i,0}$</span> (u).
+            </p>
+
+            <p>
+                <strong>Desarrolle un modelo de Programación Lineal Entera (ILP)</strong> que permita a la empresa determinar el plan de producción que minimice el costo total asociado.
+            </p>
+        </div>
+
+        <div class="footer-box">
+            <strong>Importante:</strong>
+            <ul>
+                <li>No reescriba conjuntos, ni parámetros.</li>
+                <li>Defina variables, restricciones y función objetivo.</li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

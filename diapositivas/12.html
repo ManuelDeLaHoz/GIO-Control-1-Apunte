@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Restricción 4</title>
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 40px; max-width: 1200px; width: 95%; border-top: 6px solid #f39c12; }
+        .question-header { font-size: 1.2rem; font-weight: 600; color: #7f8c8d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .enunciado-container { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 30px; font-size: 1.15rem; line-height: 1.6; color: #444; }
+        .highlight { background-color: #f39c12; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .math-display { background-color: #fdfefe; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; font-size: 1.4em; border: 1px solid #fcf3cf;}
+        
+        .interactive-container { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #fafafa; text-align: center;}
+        .interactive-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 10px; color: #34495e; }
+        
+        .switch { position: relative; display: inline-block; width: 60px; height: 30px; margin-top: 15px;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #f39c12; } /* Color ajustado al tema */
+        input:checked + .slider:before { transform: translateX(30px); }
+        
+        .equation-live { background: #2c3e50; color: #fff; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.5rem; margin-top: 25px;}
+        
+        .btn-reveal { background-color: #3498db; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; display: block; width: 100%; }
+        .btn-reveal:hover { background-color: #2980b9; }
+        .solution-container { margin-top: 30px; padding: 30px; background-color: #fef9e7; border-left: 6px solid #f39c12; border-radius: 0 8px 8px 0; display: none; animation: slideDown 0.4s ease; }
+        .solution-title { font-weight: 700; color: #d35400; margin-bottom: 15px; font-size: 1.3rem; }
+        
+        /* Estilos para la leyenda de la fórmula (Tema Naranja/Bodega) */
+        .formula-legend { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; margin-top: 20px; font-size: 1.1rem; align-items: center; background-color: #fff; padding: 25px; border-radius: 8px; border: 1px solid #fcf3cf; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .legend-symbol { font-weight: bold; color: #f39c12; text-align: right; font-size: 1.3rem; padding-right: 10px; border-right: 2px solid #ecf0f1; }
+        .legend-desc { color: #444; line-height: 1.5;}
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">Problema 2 - Restricción 4</div>
+        
+        <div class="enunciado-container">
+            La empresa pronostica para cada producto una demanda \(d_{i,t}\). Para satisfacer estas demandas... es necesario manejar inventarios. Para ello, la empresa cuenta con una <span class="highlight">bodega de capacidad \(V\)</span>, asociada a costos de almacenamiento \(h_{i,t}\). En caso de requerir espacio adicional, la empresa puede habilitar, a un costo fijo \(c_t^{\text{f,B}}\), una <span class="highlight">zona de la bodega que provee \(\Delta V\) extra</span> de capacidad. Asimismo, se conocen los <span class="highlight">volúmenes unitarios ocupados por cada tipo de producto, \(v_i\)</span> y los niveles de inventario iniciales \(I_{i,0}\).
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Capacidad Total de Bodega</div>
+            <p style="margin-top:0; font-size: 1.1rem; color: #7f8c8d;">Asume: \(V = 100 \text{ m}^3\), Extra \(\Delta V = 50 \text{ m}^3\)</p>
+            <div style="margin-bottom: 10px; font-weight:bold; font-size: 1.2rem;">Habilitar Bodega Extra (\(z_t\))</div>
+            <label class="switch"><input type="checkbox" id="zt" onchange="evalBodega()"><span class="slider"></span></label>
+            <div class="equation-live" id="liveEq">\( \text{Vol}_{\text{Total}} \le 100 + 50(0) \implies \text{Vol}_{\text{Total}} \le 100 \text{ m}^3 \)</div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Restricción Formal</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución:</div>
+            <p style="font-size: 1.15rem;">La suma del volumen de todos los inventarios debe respetar la capacidad base más la extra (si se activa):</p>
+            <div class="math-display">
+                $$ \sum_{i \in \mathcal{I}} v_i I_{i,t} \le V + \Delta V z_t \quad \forall t \in \mathcal{T} $$
+            </div>
+
+            <div class="formula-legend">
+                <div class="legend-symbol">\(\sum_{i \in \mathcal{I}}\)</div>
+                <div class="legend-desc">Suma sobre todos los productos del catálogo. Es necesario porque todos los distintos productos comparten y compiten por el mismo espacio físico de la bodega.</div>
+                
+                <div class="legend-symbol">\(v_i I_{i,t}\)</div>
+                <div class="legend-desc">Es la multiplicación del <strong>volumen unitario</strong> del producto \(i\) por la <strong>cantidad almacenada</strong> (\(I\)) de ese mismo producto. Representa el volumen total que ocupa ese producto en específico.</div>
+                
+                <div class="legend-symbol">\(\le\)</div>
+                <div class="legend-desc">Asegura que el volumen total físico ocupado no sobrepase el techo máximo disponible.</div>
+                
+                <div class="legend-symbol">\(V\)</div>
+                <div class="legend-desc">Parámetro que representa la capacidad base, estándar o por defecto de la bodega. Este espacio siempre está disponible a costo cero (de habilitación).</div>
+                
+                <div class="legend-symbol">\(\Delta V z_t\)</div>
+                <div class="legend-desc">Si la decisión de arrendar la expansión es tomada (\(z_t = 1\)), se "desbloquea" la capacidad adicional \(\Delta V\). Si no se paga el arriendo (\(z_t = 0\)), este término se anula.</div>
+                
+                <div class="legend-symbol">\(\forall t \in \mathcal{T}\)</div>
+                <div class="legend-desc">Para todo periodo de tiempo. El límite físico de la bodega no se puede violar en ningún mes del horizonte de planificación.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function evalBodega() {
+            const zt = document.getElementById('zt').checked ? 1 : 0;
+            const cap = 100 + (50 * zt);
+            const liveEq = document.getElementById('liveEq');
+            
+            liveEq.innerHTML = `\\( \\text{Vol}_{\\text{Total}} \\le 100 + 50(${zt}) \\implies \\text{Vol}_{\\text{Total}} \\le ${cap} \\text{ m}^3 \\)`;
+            
+            if (window.MathJax) MathJax.typesetPromise([liveEq]);
+        }
+
+        function toggleSolution() {
+            const box = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block'; btn.textContent = 'Ocultar Solución'; btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                box.style.display = 'none'; btn.textContent = 'Ver Restricción Formal'; btn.style.backgroundColor = '#3498db';
+            }
+        }
+    </script>
+</body>
+</html>

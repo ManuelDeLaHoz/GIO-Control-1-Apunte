@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Modelo Completo ILP</title>
+    
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: { typeset: true }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; padding: 20px; box-sizing: border-box; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 30px; max-width: 1300px; width: 98%; border-top: 8px solid #2c3e50; }
+        
+        .header-main { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .header-main h1 { margin: 0; color: #2c3e50; font-size: 1.8rem; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .section { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; }
+        .section-title { font-weight: bold; text-transform: uppercase; font-size: 0.9rem; color: #7f8c8d; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
+        
+        /* Colores temáticos */
+        .title-vars { color: #8e44ad !important; }
+        .title-restr { color: #e67e22 !important; }
+        .title-obj { color: #2980b9 !important; }
+
+        .math-box { background: #f8f9fa; padding: 12px; border-radius: 6px; margin: 10px 0; text-align: center; border: 1px solid #f0f0f0; overflow-x: auto; }
+        
+        .var-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.95rem; }
+        .var-item { background: #fcfcfc; padding: 8px; border-left: 3px solid #8e44ad; border-radius: 4px; }
+
+        .obj-container { grid-column: span 2; background: #ebf5fb; border: 1px solid #2980b9; }
+        
+        .nature-box { grid-column: span 2; font-size: 0.9rem; display: flex; justify-content: space-around; background: #fdfefe; border: 1px dashed #bdc3c7; padding: 10px; border-radius: 6px; }
+
+        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } .obj-container { grid-column: span 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header-main">
+            <h1>Formulación del Modelo de Producción e Inventario</h1>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <div class="section">
+                <div class="section-title title-vars">📦 Variables de Decisión</div>
+                <div class="var-grid">
+                    <div class="var-item"><strong>$x_{i,t}$</strong>: Unid. producidas de $i$ en $t$.</div>
+                    <div class="var-item"><strong>$I_{i,t}$</strong>: Unid. en inventario de $i$ en $t$.</div>
+                    <div class="var-item"><strong>$y_{i,t}^{\text{N}}$</strong>: 1 si usa modo Nominal para $i$ en $t$.</div>
+                    <div class="var-item"><strong>$y_{i,t}^{\text{H}}$</strong>: 1 si usa modo Hiper para $i$ en $t$.</div>
+                    <div class="var-item" style="grid-column: span 2;"><strong>$z_t$</strong>: 1 si se habilita bodega extra en el periodo $t$.</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title title-restr">⚖️ Restricciones de Capacidad</div>
+                <div style="font-size: 0.9rem; margin-bottom: 5px;">Exclusividad de Producto y Modo:</div>
+                <div class="math-box">
+                    $$ \sum_{i \in \mathcal{I}} (y_{i,t}^{\text{N}} + y_{i,t}^{\text{H}}) \le 1 \quad \forall t \in \mathcal{T} $$
+                </div>
+                <div style="font-size: 0.9rem; margin-bottom: 5px;">Límite de Producción (Big-M ajustado):</div>
+                <div class="math-box">
+                    $$ x_{i,t} \le p_{i,t}^{\text{N}} y_{i,t}^{\text{N}} + p_{i,t}^{\text{H}} y_{i,t}^{\text{H}} \quad \forall i, t $$
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title title-restr">🔄 Inventario y Bodega</div>
+                <div style="font-size: 0.9rem; margin-bottom: 5px;">Balance de Masa (Demanda):</div>
+                <div class="math-box">
+                    $$ I_{i,t} = I_{i,t-1} + x_{i,t} - d_{i,t} \quad \forall i, t $$
+                </div>
+                <div style="font-size: 0.9rem; margin-bottom: 5px;">Capacidad Física de Bodega:</div>
+                <div class="math-box">
+                    $$ \sum_{i \in \mathcal{I}} v_i I_{i,t} \le V + \Delta V z_t \quad \forall t \in \mathcal{T} $$
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🧬 Naturaleza de Variables</div>
+                <div class="nature-box">
+                    <div>$x_{i,t}, I_{i,t} \ge 0 \quad (\in \mathbb{Z}^+)$</div>
+                    <div>$y_{i,t}^{\text{N}}, y_{i,t}^{\text{H}}, z_t \in \{0, 1\}$</div>
+                </div>
+                <p style="font-size: 0.8rem; color: #7f8c8d; margin-top: 15px; text-align: center;">
+                    *Nota: $x$ e $I$ se definen como enteras por la unidad de medida (u).
+                </p>
+            </div>
+
+            <div class="section obj-container">
+                <div class="section-title title-obj">🎯 Función Objetivo: Minimizar Costos Totales</div>
+                <div class="math-box" style="background: white; font-size: 1.1rem;">
+                    $$ \min Z = \sum_{t \in \mathcal{T}} \left[ \sum_{i \in \mathcal{I}} ( c_{i,t}^{\text{v}} x_{i,t} + c_{i,t}^{\text{f,N}} y_{i,t}^{\text{N}} + c_{i,t}^{\text{f,H}} y_{i,t}^{\text{H}} + h_{i,t} I_{i,t} ) + c_t^{\text{f,B}} z_t \right] $$
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

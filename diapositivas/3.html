@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pregunta de Optimización - Restricciones</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+            max-width: 750px;
+            width: 100%;
+            border-top: 6px solid #2c3e50;
+        }
+
+        .question-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-body {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+
+        .math-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        /* Estilos del Expansor Visual */
+        .interactive-container {
+            margin-top: 25px;
+            margin-bottom: 25px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+
+        .interactive-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #34495e;
+            text-align: center;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        select {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .expanded-equations {
+            background-color: #fff;
+            border: 1px dashed #bdc3c7;
+            padding: 15px;
+            border-radius: 6px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .equation-row {
+            margin: 8px 0;
+            padding-left: 20px;
+            border-left: 3px solid #3498db;
+            animation: slideIn 0.3s ease forwards;
+            opacity: 0;
+        }
+
+        .btn-reveal {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+            display: block;
+            width: 100%;
+        }
+
+        .btn-reveal:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-reveal:active {
+            transform: scale(0.98);
+        }
+
+        .solution-container {
+            margin-top: 25px;
+            padding: 25px;
+            background-color: #fff3f3;
+            border-left: 5px solid #e74c3c;
+            border-radius: 0 8px 8px 0;
+            display: none;
+            animation: slideDown 0.4s ease;
+        }
+
+        .solution-title {
+            font-weight: 700;
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-size: 1.2rem;
+        }
+
+        .highlight-word {
+            background-color: #f1c40f;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">
+            Problema (b)
+        </div>
+        
+        <div class="question-body">
+            En un problema de optimización, una expresión de la forma:
+            
+            <div class="math-display">
+                $$ \sum_{j \in J} x_{ij} = 1, \quad \forall i \in I $$
+            </div>
+            
+            indica una <span class="highlight-word">única</span> restricción que se debe cumplir para el \(i\)-ésimo elemento del conjunto \(I\).
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Expansor de Restricciones (\(\forall i \in I\))</div>
+            
+            <div class="controls">
+                <label for="setSize">Supongamos que el tamaño del conjunto \(I\) es:</label>
+                <select id="setSize" onchange="updateEquations()">
+                    <option value="1">|I| = 1 elemento</option>
+                    <option value="2">|I| = 2 elementos</option>
+                    <option value="3" selected>|I| = 3 elementos</option>
+                    <option value="5">|I| = 5 elementos</option>
+                </select>
+            </div>
+
+            <div class="expanded-equations" id="equationsContainer">
+                </div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Solución y Explicación</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución Detallada:</div>
+            <div style="font-size: 1.1rem; line-height: 1.6;">
+                <strong>FALSO.</strong> La expresión no representa una única restricción en total. 
+                <br><br>
+                El símbolo <strong>\(\forall\) (para todo)</strong> actúa como un "bucle" o iterador en matemáticas. La expresión indica que se debe generar una restricción independiente por <strong>cada</strong> elemento que exista dentro del conjunto \(I\). Por lo tanto, representa una <em>familia</em> o <em>conjunto de restricciones</em>, no una sola.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Actualiza las ecuaciones cuando cambia el select
+        function updateEquations() {
+            const container = document.getElementById('equationsContainer');
+            const size = parseInt(document.getElementById('setSize').value);
+            
+            // Corrección: Doble barra invertida (\\) requerida en strings de JS para que MathJax reciba una sola barra (\)
+            let htmlContent = `<div style="margin-bottom: 10px; color: #7f8c8d; font-size: 0.9em;">Si \\( I = \\{1, 2, \\dots, ${size}\\} \\), el modelo matemático generará:</div>`;
+            
+            for(let i = 1; i <= size; i++) {
+                htmlContent += `
+                    <div class="equation-row" style="animation-delay: ${i * 0.1}s">
+                        \\( \\text{Para } i=${i}: \\quad \\sum_{j \\in J} x_{${i}j} = 1 \\)
+                    </div>
+                `;
+            }
+            
+            htmlContent += `<div style="margin-top: 15px; font-weight: bold; color: #c0392b;">Total generado: ${size} restricciones independientes.</div>`;
+
+            container.innerHTML = htmlContent;
+            
+            // Le decimos a MathJax que renderice las nuevas matemáticas inyectadas
+            if (window.MathJax) {
+                MathJax.typesetPromise([container]).catch(function (err) {
+                    console.log('Error de MathJax: ' + err.message);
+                });
+            }
+        }
+
+        // Lógica de la interfaz de la solución
+        function toggleSolution() {
+            const solutionBox = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            
+            if (solutionBox.style.display === 'none' || solutionBox.style.display === '') {
+                solutionBox.style.display = 'block';
+                btn.textContent = 'Ocultar Solución';
+                btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                solutionBox.style.display = 'none';
+                btn.textContent = 'Ver Solución y Explicación';
+                btn.style.backgroundColor = '#3498db';
+            }
+        }
+
+        // Inicializar el expansor al cargar la página
+        window.onload = function() {
+            setTimeout(updateEquations, 500); 
+        };
+    </script>
+</body>
+</html>

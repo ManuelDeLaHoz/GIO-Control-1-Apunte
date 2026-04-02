@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Variables</title>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 40px; max-width: 1200px; width: 95%; border-top: 6px solid #9b59b6; }
+        .question-header { font-size: 1.2rem; font-weight: 600; color: #7f8c8d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .enunciado-container { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 30px; font-size: 1.15rem; line-height: 1.6; color: #444; }
+        .highlight { background-color: #f39c12; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        
+        .interactive-container { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #fafafa; }
+        .interactive-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 25px; color: #34495e; text-align: center; }
+        .logic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: center; margin-bottom: 10px; }
+        .variable-box { background: #fff; padding: 25px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.02); transition: all 0.3s; cursor: pointer; font-size: 1.1rem;}
+        .variable-box:hover { border-color: #9b59b6; background-color: #f4ecf7; transform: translateY(-3px); }
+        .var-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+        
+        .btn-reveal { background-color: #3498db; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; display: block; width: 100%; }
+        .btn-reveal:hover { background-color: #2980b9; }
+        .solution-container { margin-top: 30px; padding: 30px; background-color: #f4ecf7; border-left: 6px solid #9b59b6; border-radius: 0 8px 8px 0; display: none; animation: slideDown 0.4s ease; }
+        .solution-title { font-weight: 700; color: #8e44ad; margin-bottom: 15px; font-size: 1.3rem; }
+        .var-list li { margin-bottom: 15px; font-size: 1.2rem;}
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">Problema 2 - Identificación de Variables</div>
+        
+        <div class="enunciado-container">
+            Una empresa manufacturera debe <span class="highlight">planificar la producción</span> de su cartera de \(|\mathcal{I}|\) productos durante los próximos \(|\mathcal{T}|\) periodos. La compañía dispone de una única línea de producción, la cual puede <span class="highlight">operar en dos modos</span> mutuamente excluyentes: nominal e hiper. En el modo nominal, la producción del producto \(i\) en el periodo \(t\) implica un costo fijo \(c_{i,t}^{\text{f,N}}\), asociado a una capacidad de producción \(p_{i,t}^{\text{N}}\). En cambio, en el modo hiper, la línea proporciona una mayor capacidad de producción \(p_{i,t}^{\text{H}}\), aunque con un costo fijo más elevado: \(c_{i,t}^{\text{f,H}}\). El costo variable \(c_{i,t}^{\text{v}}\) es independiente del modo de operación.
+            <br><br>
+            La empresa pronostica para cada producto una demanda \(d_{i,t}\). Para satisfacer estas demandas, dado que la línea de producción solo puede configurarse para fabricar un tipo de producto por periodo, es necesario <span class="highlight">manejar inventarios</span>. Para ello, la empresa cuenta con una bodega de capacidad \(V\), asociada a costos de almacenamiento \(h_{i,t}\). En caso de requerir espacio adicional, la empresa puede <span class="highlight">habilitar</span>, a un costo fijo \(c_t^{\text{f,B}}\), una <span class="highlight">zona de la bodega que provee \(\Delta V\) extra</span> de capacidad. 
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Identificador Interactivo (Haz clic en los cuadros)</div>
+            <div class="logic-grid">
+                <div class="variable-box" onclick="alert('Variables Continuas/Enteras:\nxi,t : Unidades producidas\nIi,t : Unidades almacenadas (Inventario)')">
+                    <span class="var-icon">📦</span>
+                    <strong>Cantidades a definir</strong><br>¿Cuánto producir y guardar?
+                </div>
+                <div class="variable-box" onclick="alert('Variables Binarias (0 o 1):\ny^N_i,t : Modo Nominal (Sí/No)\ny^H_i,t : Modo Hiper (Sí/No)\nz_t : Habilitar Bodega Extra (Sí/No)')">
+                    <span class="var-icon">⚙️</span>
+                    <strong>Decisiones Lógicas (Sí/No)</strong><br>¿Qué modo usar? ¿Ampliar bodega?
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Variables Formales</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución:</div>
+            <ul class="var-list">
+                <li>\(x_{i,t}, I_{i,t} \in \mathbb{Z}_0^+\) : (u) producidas y almacenadas de producto \(i\) en \(t\).</li>
+                <li>\(y_{i,t}^{\text{N}}, y_{i,t}^{\text{H}} \in \{0,1\}\) : 1 si se produce \(i\) en \(t\) en modo <em>nominal</em> o <em>hiper</em>, 0 si no.</li>
+                <li>\(z_t \in \{0,1\}\) : 1 si se habilita el espacio adicional de almacenamiento en \(t\), 0 si no.</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        function toggleSolution() {
+            const solutionBox = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            if (solutionBox.style.display === 'none' || solutionBox.style.display === '') {
+                solutionBox.style.display = 'block';
+                btn.textContent = 'Ocultar Solución';
+                btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                solutionBox.style.display = 'none';
+                btn.textContent = 'Ver Variables Formales';
+                btn.style.backgroundColor = '#3498db';
+            }
+        }
+    </script>
+</body>
+</html>

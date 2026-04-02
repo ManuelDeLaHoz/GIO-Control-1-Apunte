@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problema 2 - Restricción 2</title>
+    
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            startup: {
+                typeset: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; color: #333; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background-color: #ffffff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); padding: 40px; max-width: 1200px; width: 95%; border-top: 6px solid #3498db; }
+        .question-header { font-size: 1.2rem; font-weight: 600; color: #7f8c8d; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .enunciado-container { background-color: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 30px; font-size: 1.15rem; line-height: 1.6; color: #444; }
+        .highlight { background-color: #3498db; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .math-display { background-color: #fdfefe; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; font-size: 1.4em; border: 1px solid #d6eaf8;}
+        
+        .interactive-container { margin-bottom: 30px; border: 1px solid #e0e0e0; border-radius: 8px; padding: 30px; background-color: #fafafa; }
+        .interactive-title { font-weight: 600; font-size: 1.2rem; margin-bottom: 10px; color: #34495e; text-align: center; }
+        .logic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; text-align: center; margin-bottom: 20px; margin-top: 20px;}
+        
+        .switch { position: relative; display: inline-block; width: 60px; height: 30px; margin-top:15px;}
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 30px; }
+        .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #3498db; }
+        input:checked + .slider:before { transform: translateX(30px); }
+        
+        .equation-live { background: #2c3e50; color: #fff; padding: 20px; border-radius: 8px; text-align: center; font-size: 1.5rem; transition: background-color 0.3s;}
+        
+        .btn-reveal { background-color: #3498db; color: white; border: none; padding: 15px 30px; font-size: 1.1rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: background-color 0.3s ease; display: block; width: 100%; }
+        .btn-reveal:hover { background-color: #2980b9; }
+        .solution-container { margin-top: 30px; padding: 30px; background-color: #ebf5fb; border-left: 6px solid #3498db; border-radius: 0 8px 8px 0; display: none; animation: slideDown 0.4s ease; }
+        .solution-title { font-weight: 700; color: #2980b9; margin-bottom: 15px; font-size: 1.3rem; }
+        
+        /* Estilos para la leyenda de la fórmula */
+        .formula-legend { display: grid; grid-template-columns: auto 1fr; gap: 15px 20px; margin-top: 20px; font-size: 1.1rem; align-items: center; background-color: #fff; padding: 25px; border-radius: 8px; border: 1px solid #d6eaf8; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+        .legend-symbol { font-weight: bold; color: #3498db; text-align: right; font-size: 1.3rem; padding-right: 10px; border-right: 2px solid #ecf0f1; }
+        .legend-desc { color: #444; line-height: 1.5;}
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="question-header">Problema 2 - Restricción 2</div>
+        
+        <div class="enunciado-container">
+            Una empresa manufacturera debe planificar la producción de su cartera de \(|\mathcal{I}|\) productos durante los próximos \(|\mathcal{T}|\) periodos... En el modo nominal, la producción del producto \(i\) en el periodo \(t\) implica un costo fijo, asociado a una <span class="highlight">capacidad de producción \(p_{i,t}^{\text{N}}\)</span>, dada por la tasa nominal de operación de la línea. En cambio, en el modo hiper, la línea se configura para producir a una mayor tasa, lo que proporciona una <span class="highlight">mayor capacidad de producción \(p_{i,t}^{\text{H}}\)</span>...
+        </div>
+
+        <div class="interactive-container">
+            <div class="interactive-title">Simulador de Big-M (Activación de Capacidad)</div>
+            <p style="text-align: center; font-size:1.1rem; margin-top:0; color: #7f8c8d;">Asume: \(p^{\text{N}} = 100\), \(p^{\text{H}} = 250\)</p>
+            <div class="logic-grid">
+                <div style="font-size: 1.2rem;">
+                    <div>Encender Nominal (\(y^{\text{N}}\))</div>
+                    <label class="switch"><input type="checkbox" id="yN" onchange="evalCap()"><span class="slider"></span></label>
+                </div>
+                <div style="font-size: 1.2rem;">
+                    <div>Encender Hiper (\(y^{\text{H}}\))</div>
+                    <label class="switch"><input type="checkbox" id="yH" onchange="evalCap()"><span class="slider"></span></label>
+                </div>
+            </div>
+            <div class="equation-live" id="liveEq">\( x \le 100(0) + 250(0) \implies x \le 0 \)</div>
+        </div>
+
+        <button class="btn-reveal" id="revealBtn" onclick="toggleSolution()">Ver Restricción Formal</button>
+
+        <div class="solution-container" id="solutionBox">
+            <div class="solution-title">Solución:</div>
+            <p style="font-size: 1.15rem;">La cantidad producida \(x\) está limitada a la capacidad que la variable binaria "desbloquee" (Big-M con cotas ajustadas):</p>
+            <div class="math-display">
+                $$ x_{i,t} \le p_{i,t}^{\text{N}} y_{i,t}^{\text{N}} + p_{i,t}^{\text{H}} y_{i,t}^{\text{H}} \quad \forall i \in \mathcal{I}, t \in \mathcal{T} $$
+            </div>
+
+            <div class="formula-legend">
+                <div class="legend-symbol">\(x_{i,t}\)</div>
+                <div class="legend-desc">Variable continua. Representa la cantidad exacta de unidades producidas del producto \(i\) en el periodo \(t\).</div>
+                
+                <div class="legend-symbol">\(\le\)</div>
+                <div class="legend-desc">"Menor o igual que". Asegura que la producción no exceda la capacidad máxima habilitada.</div>
+
+                <div class="legend-symbol">\(p_{i,t}^{\text{N}} y_{i,t}^{\text{N}}\)</div>
+                <div class="legend-desc">Término de capacidad <strong>nominal</strong>. Si el modo nominal está apagado (\(y^{\text{N}}=0\)), este término se vuelve cero. Si está encendido (\(y^{\text{N}}=1\)), "aporta" o "desbloquea" una capacidad máxima de \(p^{\text{N}}\) unidades.</div>
+                
+                <div class="legend-symbol">\(p_{i,t}^{\text{H}} y_{i,t}^{\text{H}}\)</div>
+                <div class="legend-desc">Término de capacidad <strong>hiper</strong>. Funciona igual que el anterior, pero desbloqueando la capacidad mayor \(p^{\text{H}}\) si se decide encender el modo hiper (\(y^{\text{H}}=1\)).</div>
+                
+                <div class="legend-symbol">\(\forall i \in \mathcal{I}, t \in \mathcal{T}\)</div>
+                <div class="legend-desc">"Para todo producto \(i\) y para todo periodo \(t\)". Indica que esta limitación de capacidad debe cumplirse en todo momento y para cada tipo de producto.</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function evalCap() {
+            let yN = document.getElementById('yN').checked;
+            let yH = document.getElementById('yH').checked;
+            
+            if (yN && yH) {
+                if(event.target.id === 'yN') { document.getElementById('yH').checked = false; yH = false; }
+                else { document.getElementById('yN').checked = false; yN = false; }
+            }
+
+            const valN = yN ? 1 : 0;
+            const valH = yH ? 1 : 0;
+            const maxCap = (valN * 100) + (valH * 250);
+
+            const liveEq = document.getElementById('liveEq');
+            liveEq.innerHTML = `\\( x \\le 100(${valN}) + 250(${valH}) \\implies x \\le ${maxCap} \\)`;
+            
+            if (window.MathJax) MathJax.typesetPromise([liveEq]);
+        }
+
+        function toggleSolution() {
+            const box = document.getElementById('solutionBox');
+            const btn = document.getElementById('revealBtn');
+            if (box.style.display === 'none' || box.style.display === '') {
+                box.style.display = 'block'; btn.textContent = 'Ocultar Solución'; btn.style.backgroundColor = '#7f8c8d';
+            } else {
+                box.style.display = 'none'; btn.textContent = 'Ver Restricción Formal'; btn.style.backgroundColor = '#3498db';
+            }
+        }
+    </script>
+</body>
+</html>
